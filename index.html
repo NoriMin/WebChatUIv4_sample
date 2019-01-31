@@ -3,27 +3,24 @@
   <head>
     <meta charset="utf-8"/>
     <title>Web Chat: Markdown</title>
-    
-    <script src="https://cdn.botframework.com/botframework-webchat/master/webchat.js"></script>
-    <script src="https://cdn.botframework.com/botframework-webchat/4.2.1-master.14eebbb/webchat-es5.js"></script>
+
+    <script src="https://cdn.botframework.com/botframework-webchat/master/webchat-es5.js"></script>
     <script src="https://unpkg.com/marked@0.6.0/lib/marked.js"></script>
     <script src="https://unpkg.com/sanitize-html@1.20.0/dist/sanitize-html.min.js"></script>
     <link rel="stylesheet" href="index.css">
-    
+
   </head>
   <body>
-    <div class="wc-header"<span> チャットボット </span></div>
+    <div class="wc-header"><span> チャットボット </span></div>
     <div id="webchat" role="main"></div>
-    
-    <script>
 
-      (async function(){
-        fetch('https://directline.botframework.com/v3/directline/tokens/generate', { 
-                                  method: 'POST',
-                                  headers:{
-                                    'Authorization': 'Bearer YOUR_SECRET_KEY'
-                                    } 
-                                  })
+    <script>
+      fetch('https://directline.botframework.com/v3/directline/tokens/generate', {
+        method: 'POST',
+        headers:{
+          'Authorization': 'Bearer YOUR_SECRET_KEY'
+        }
+      })
         .then(function (res) { return res.json(); })
         .then(function (json) {
           const token = json.token;
@@ -82,14 +79,18 @@
           });
 
           //フォントの設定
-          styleSet.textContent = { ...styleSet.textContent,
-          fontFamily: '\'Comic Sans MS\', \'Arial\', sans-serif',
-          fontWeight: 'bold',
-          };
+          styleSet.textContent = Object.assign(
+            {},
+            styleSet.textContent,
+            {
+              fontFamily: '\'Comic Sans MS\', \'Arial\', sans-serif',
+              fontWeight: 'bold',
+            }
+          );
 
           window.WebChat.renderWebChat({
             directLine: window.WebChat.createDirectLine({ token: token }),
-            styleSet,
+            styleSet: styleSet,
             renderMarkdown: function (markdown) {
               const html = window.marked(markdown);
 
@@ -98,10 +99,7 @@
           }, document.getElementById('webchat'));
 
           document.querySelector('#webchat > *').focus();
-        })
-
-      })().catch(err => console.error(err));
-
+        });
     </script>
   </body>
 </html>
