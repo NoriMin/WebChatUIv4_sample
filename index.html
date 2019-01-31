@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="ja-JP">
+  <head>
+    <meta charset="utf-8"/>
+    <title>Web Chat: Markdown</title>
+    
+    <script src="https://cdn.botframework.com/botframework-webchat/master/webchat.js"></script>
+    <script src="https://cdn.botframework.com/botframework-webchat/4.2.1-master.14eebbb/webchat-es5.js"></script>
+    <script src="https://unpkg.com/marked@0.6.0/lib/marked.js"></script>
+    <script src="https://unpkg.com/sanitize-html@1.20.0/dist/sanitize-html.min.js"></script>
+    <link rel="stylesheet" href="index.css">
+    
+  </head>
+  <body>
+    <div class="wc-header"<span> チャットボット </span></div>
+    <div id="webchat" role="main"></div>
+    
+    <script>
+
+      (async function(){
+        fetch('https://directline.botframework.com/v3/directline/tokens/generate', { 
+                                  method: 'POST',
+                                  headers:{
+                                    'Authorization': 'Bearer YOUR_SECRET_KEY'
+                                    } 
+                                  })
+        .then(function (res) { return res.json(); })
+        .then(function (json) {
+          const token = json.token;
+          const SANITIZE_HTML_OPTIONS = {
+            allowedAttributes: {
+              a: ['href', 'name', 'target', 'title'],
+              img: ['alt', 'src']
+            },
+            allowedSchemes: ['file', 'http', 'https'],
+            allowedTags: [
+              'a',
+              'b',
+              'blockquote',
+              'br',
+              'caption',
+              'code',
+              'div',
+              'em',
+              'h1',
+              'h2',
+              'h3',
+              'h4',
+              'h5',
+              'h6',
+              'hr',
+              'i',
+              'img',
+              'li',
+              'nl',
+              'ol',
+              'p',
+              'pre',
+              'span',
+              'strike',
+              'strong',
+              'table',
+              'tbody',
+              'td',
+              'tfoot',
+              'th',
+              'thead',
+              'tr',
+              'ul'
+            ]
+          };
+
+          //メッセージの色や大きさの設定
+          const styleSet = window.WebChat.createStyleSet({
+            bubbleBackground: 'rgba(0, 0, 255, .1)', //Botからのメッセージボックスの色を設定できます
+            bubbleFromUserBackground: 'rgba(0, 255, 0, .1)', //ユーザからのメッセージボックスの色を設定できます
+            bubbleTextColor: 'blue', //Botからのメッセージの色を設定できます
+            bubbleFromUserTextColor: 'blue',　//ユーザからのメッセージの色を設定できます
+            bubbleBorderRadius: 50, //Botからのメッセージボックスの形を丸くできます
+            bubbleFromUserBorderRadius: 50,　//ユーザからのメッセージボックスの形を丸くできます
+            sendBoxTextColor: 'Blue' //入力している際の文字の色を設定できます
+          });
+
+          //フォントの設定
+          styleSet.textContent = { ...styleSet.textContent,
+          fontFamily: '\'Comic Sans MS\', \'Arial\', sans-serif',
+          fontWeight: 'bold',
+          };
+
+          window.WebChat.renderWebChat({
+            directLine: window.WebChat.createDirectLine({ token: token }),
+            styleSet,
+            renderMarkdown: function (markdown) {
+              const html = window.marked(markdown);
+
+              return sanitizeHtml(html, SANITIZE_HTML_OPTIONS);
+            }
+          }, document.getElementById('webchat'));
+
+          document.querySelector('#webchat > *').focus();
+        })
+
+      })().catch(err => console.error(err));
+
+    </script>
+  </body>
+</html>
